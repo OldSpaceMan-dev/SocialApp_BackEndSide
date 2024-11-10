@@ -12,17 +12,30 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 class PostDaoImpl : PostDao {
 
 
-    override suspend fun createPost(caption: String, imageUrl: String, userId: Long): Boolean {
+    override suspend fun createPost(caption: String, imageUrl: String, userId: Long): PostRow? {
         return dbQuery{
+            val postId = IdGenerator.generateId()
+
             val insertStatement = PostTable.insert {
-                it[postId] = IdGenerator.generateId()
+                it[PostTable.postId] = postId
                 it[PostTable.caption] = caption // заголовок
                 it[PostTable.imageUrl] = imageUrl
                 it[likesCount] = 0
                 it[commentsCount] = 0
                 it[PostTable.userId] = userId
             }
-            insertStatement.resultedValues?.singleOrNull() != null
+            insertStatement.resultedValues?.singleOrNull()?.let {
+                PostTable
+                    .join(
+                        otherTable = UserTable,
+                        onColumn = PostTable.userId,
+                        otherColumn = UserTable.id,
+                        joinType = JoinType.INNER
+                    )
+                    .select { PostTable.postId eq postId }
+                    .singleOrNull()
+                    ?.let { toPostRow(it) }
+            }
         }
     }
 
@@ -48,7 +61,15 @@ class PostDaoImpl : PostDao {
                         joinType = JoinType.INNER
                     )
                     .selectAll()
-                    .orderBy(column = PostTable.likesCount, order = SortOrder.DESC) // likesCount = show popular post if you haven't followed yet
+                    .orderBy(
+                        // сначала происходит сортировка по убыванию likesCount.
+                        // Если у нескольких постов одинаковое количество лайков,
+                        // они сортируются между собой по дате создания
+                        // First sort by likesCount in descending order
+                        PostTable.likesCount to SortOrder.DESC,
+                        // Then sort by createdAt in descending order if likesCount is the same
+                        PostTable.createdAt to SortOrder.DESC
+                    )
                     .limit( n = pageSize, offset = ((pageNumber -1) * pageSize).toLong() )
                     .map { toPostRow(it) }
             }
@@ -113,7 +134,11 @@ class PostDaoImpl : PostDao {
 
 
     //private fun
-    private fun getPosts( users: List<Long>, pageNumber: Int, pageSize: Int ): List<PostRow> {
+    private fun getPosts(
+        users: List<Long>,
+        pageNumber: Int,
+        pageSize: Int
+    ): List<PostRow> {
         return PostTable
             .join(
                 otherTable = UserTable,

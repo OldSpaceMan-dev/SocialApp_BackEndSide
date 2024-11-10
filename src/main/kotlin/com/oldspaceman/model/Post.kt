@@ -42,3 +42,9 @@ data class PostsResponse(
     val posts: List<Post> = listOf(),
     val message: String? = null
 )
+
+@Serializable
+data class RemovePostParams(
+    val postId: Long,
+    val userId: Long
+)

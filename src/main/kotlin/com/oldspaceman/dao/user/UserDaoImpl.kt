@@ -1,6 +1,7 @@
 package com.oldspaceman.dao.user
 
 import com.oldspaceman.dao.DatabaseFactory.dbQuery
+import com.oldspaceman.dao.post.PostTable
 import com.oldspaceman.model.SignUpParams
 import com.oldspaceman.security.hashPassword
 import com.oldspaceman.util.IdGenerator
@@ -93,6 +94,12 @@ class UserDaoImpl : UserDao {
         }
     }
 
+
+
+
+
+
+
     //like a Map?
     private fun rowToUser(row: ResultRow): UserRow{
         return UserRow(
@@ -102,7 +109,8 @@ class UserDaoImpl : UserDao {
             imageUrl = row[UserTable.imageUrl],
             password = row[UserTable.password],
             followersCount = row[UserTable.followersCount],
-            followingCount = row[UserTable.followingCount]
+            followingCount = row[UserTable.followingCount],
+            postCount = row[UserTable.postCount]
         )
     }
 

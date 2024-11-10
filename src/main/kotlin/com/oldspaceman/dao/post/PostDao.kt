@@ -23,4 +23,6 @@ interface PostDao{
 
     suspend fun deletePost(postId: Long): Boolean
 
+    //обновляем каут постов при создании и удалении
+    suspend fun updatePostCount(userId: Long, decrement: Boolean = false): Boolean
 }

@@ -58,7 +58,7 @@ dependencies {
     //take time(current time)
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
 
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 
 
 }

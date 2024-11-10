@@ -1,8 +1,6 @@
 package com.oldspaceman.route
 
-import com.oldspaceman.model.PostResponse
-import com.oldspaceman.model.PostTextParams
-import com.oldspaceman.model.PostsResponse
+import com.oldspaceman.model.*
 import com.oldspaceman.repository.post.PostRepository
 import com.oldspaceman.util.Constants
 import com.oldspaceman.util.getLongParameter
@@ -110,6 +108,39 @@ fun Routing.postRouting(){
                 }
             }
 
+            delete(path = "/delete"){
+
+                try {
+                    val postParams = call.receiveNullable<RemovePostParams>()
+
+                    if (postParams == null) {
+                        call.respond(
+                            status = HttpStatusCode.BadRequest,
+                            message = PostResponse(
+                                success = false,
+                                message = "Could not parse post parameters"
+                            )
+                        )
+                        return@delete
+                    }
+
+                    val result = postRepository.deletePost(postParams = postParams)
+                    call.respond(status = result.code, message = result.data)
+
+
+                } catch (error: Throwable) {
+                    call.respond(
+                        status = HttpStatusCode.InternalServerError,
+                        message = CommentResponse(
+                            success = false,
+                            message = "An unexpected error occurred, try again!"
+                        )
+                    )
+                    return@delete
+                }
+            }
+
+            /*
             delete(path = "/{postId}"){
                 try {
                     val postId = call.getLongParameter(name = "postId")
@@ -133,6 +164,7 @@ fun Routing.postRouting(){
                     )
                 }
             }
+             */
         }
 
 
@@ -150,8 +182,8 @@ fun Routing.postRouting(){
 
                     val result = postRepository.getFeedPosts(
                         userId = currentUserId,
-                        pageNumber = page,
-                        pageSize = limit
+                        pageSize = limit,
+                        pageNumber = page
                     )
                     call.respond(
                         status = result.code,

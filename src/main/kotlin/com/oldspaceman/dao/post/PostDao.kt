@@ -3,7 +3,8 @@ package com.oldspaceman.dao.post
 interface PostDao{
 
     //Boolean - post created or not
-    suspend fun createPost(caption: String, imageUrl: String, userId: Long): Boolean
+    //add PostRow? - тк хотим вернуть сам пост а не bool
+    suspend fun createPost(caption: String, imageUrl: String, userId: Long): PostRow?
 
     //feeds - лента // follows - people that following
     suspend fun getFeedsPost(userId: Long, follows: List<Long>, pageNumber: Int, pageSize: Int): List<PostRow>

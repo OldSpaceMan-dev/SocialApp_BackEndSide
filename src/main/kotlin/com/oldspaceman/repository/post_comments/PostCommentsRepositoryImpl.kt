@@ -106,7 +106,7 @@ class PostCommentsRepositoryImpl(
             commentId = commentRow.commentId,
             content = commentRow.content,
             postId = commentRow.postId,
-            userId = commentRow.postId,
+            userId = commentRow.userId, // !!!! тут была проблема - было commentRow.postId,
             userName = commentRow.userName,
             userImageUrl = commentRow.userImageUrl,
             createdAt = commentRow.createdAt

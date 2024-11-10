@@ -3,6 +3,7 @@ package com.oldspaceman.repository.post
 import com.oldspaceman.model.PostResponse
 import com.oldspaceman.model.PostTextParams
 import com.oldspaceman.model.PostsResponse
+import com.oldspaceman.model.RemovePostParams
 import com.oldspaceman.util.Response
 
 interface PostRepository {
@@ -22,6 +23,9 @@ interface PostRepository {
 
     suspend fun getPost(postId: Long, currentUserId: Long): Response<PostResponse>
 
-    suspend fun deletePost(postId: Long): Response<PostResponse>
+
+    //теперь передаем на постайди - а RemovePostParams
+    suspend fun deletePost(postParams: RemovePostParams): Response<PostResponse>
+    //suspend fun deletePost(postId: Long): Response<PostResponse>
 
 }

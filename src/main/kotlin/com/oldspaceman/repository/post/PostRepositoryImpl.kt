@@ -4,10 +4,7 @@ import com.oldspaceman.dao.follows.FollowsDao
 import com.oldspaceman.dao.post.PostDao
 import com.oldspaceman.dao.post.PostRow
 import com.oldspaceman.dao.post_likes.PostLikesDao
-import com.oldspaceman.model.Post
-import com.oldspaceman.model.PostResponse
-import com.oldspaceman.model.PostTextParams
-import com.oldspaceman.model.PostsResponse
+import com.oldspaceman.model.*
 import com.oldspaceman.util.Response
 import io.ktor.http.*
 
@@ -19,17 +16,24 @@ class PostRepositoryImpl(
 
 
     override suspend fun createPost(imageUrl: String, postTextParam: PostTextParams): Response<PostResponse> {
-        val postIsCreated = postDao.createPost(
+        val postRow = postDao.createPost(
             caption = postTextParam.caption,
             imageUrl = imageUrl,
             userId = postTextParam.userId
         )
 
-        return if (postIsCreated){
+        return if (postRow != null){
             Response.Success(
-                data = PostResponse(success = true) // notify only what post create
+                data = PostResponse(
+                    success = true,
+                    post = toPost(
+                        postRow = postRow,
+                        isPostLiked = false,
+                        isOwnPost = true
+                    )
+                ) // notify only what post create and send postRow
             )
-        }else{
+        } else {
             Response.Error(
                 code = HttpStatusCode.InternalServerError,
                 data = PostResponse(
@@ -111,7 +115,7 @@ class PostRepositoryImpl(
     override suspend fun getPost(postId: Long, currentUserId: Long): Response<PostResponse> {
         val post = postDao.getPost(postId = postId)
 
-        return if (post == null){
+        return if (post == null) {
             Response.Error(
                 code = HttpStatusCode.InternalServerError,
                 data = PostResponse(
@@ -119,7 +123,7 @@ class PostRepositoryImpl(
                     message = "Could not retrieve post from database"
                 )
             )
-        }else{
+        } else {
             val isPostLiked = postLikesDao.isPostLikedByUser(postId, currentUserId)
             //is current user Owner this post
             val isOwnPost = post.postId == currentUserId // проверка на пренадлежность поста конретному юзеру
@@ -134,8 +138,41 @@ class PostRepositoryImpl(
     }
 
 
+    override suspend fun deletePost(postParams: RemovePostParams): Response<PostResponse> {
 
 
+        val post = postDao.getPost(postId = postParams.postId)
+
+
+        return if (post != null && post.userId == postParams.userId) {
+            val postIsDeleted = postDao.deletePost(postId = postParams.postId)
+
+            if (postIsDeleted) {
+                Response.Success(
+                    data = PostResponse(success = true) // notify only what post deleted
+                )
+            } else {
+                Response.Error(
+                    code = HttpStatusCode.InternalServerError,
+                    data = PostResponse(
+                        success = false,
+                        message = "Post could not be deleted from the db" // not be вставить в базу данных
+                    )
+                )
+            }
+        } else {
+            Response.Error(
+                code = HttpStatusCode.Forbidden,
+                data = PostResponse(
+                    success = false,
+                    message = "User is not the owner of the post"
+                )
+            )
+        }
+
+    }
+
+/*
     override suspend fun deletePost(postId: Long): Response<PostResponse> {
         val postIsDeleted = postDao.deletePost(
             postId = postId
@@ -155,9 +192,13 @@ class PostRepositoryImpl(
             )
         }
     }
+ */
 
-
-    private fun toPost(postRow: PostRow, isPostLiked: Boolean, isOwnPost: Boolean): Post{
+    private fun toPost(
+        postRow: PostRow,
+        isPostLiked: Boolean,
+        isOwnPost: Boolean
+    ): Post{
         return Post(
             postId = postRow.postId,
             caption = postRow.caption,

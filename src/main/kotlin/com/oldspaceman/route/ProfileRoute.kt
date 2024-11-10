@@ -71,7 +71,7 @@ fun Routing.profileRouting(){
                     }
 
                     //building image url
-                    val imageUrl = "${Constants.BASE_URL}${Constants.POST_IMAGES_FOLDER}$fileName"
+                    val imageUrl = "${Constants.BASE_URL}${Constants.PROFILE_IMAGES_FOLDER}$fileName"
 
                     val result = repository.updateUser(
                         updateUserParams = updateUserParams!!.copy(

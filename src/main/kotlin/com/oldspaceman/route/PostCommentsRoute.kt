@@ -21,6 +21,8 @@ fun Routing.postCommentsRouting(){
     authenticate {
         route(path = "/post/comments"){
 
+
+            //,,!!!!! тут ошбика
             post(path = "/create"){
                 try {
                     val params = call.receiveNullable<NewCommentParams>()

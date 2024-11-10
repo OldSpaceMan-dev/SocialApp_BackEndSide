@@ -15,6 +15,8 @@ object UserTable: Table(name = "users"){
     val followersCount = integer(name = "followers_count").default(defaultValue = 0)
     val followingCount = integer(name = "following_count").default(defaultValue = 0)
 
+    val postCount = integer(name = "post_count").default(defaultValue = 0)
+
     override val primaryKey: PrimaryKey
         get() = PrimaryKey(id)
 
@@ -27,5 +29,6 @@ data class UserRow(
     val imageUrl: String?,
     val password: String,
     val followersCount: Int,
-    val followingCount: Int
+    val followingCount: Int,
+    val postCount: Int //для посчета постов у юзера
 )

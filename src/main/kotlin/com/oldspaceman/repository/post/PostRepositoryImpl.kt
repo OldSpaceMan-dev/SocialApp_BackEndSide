@@ -4,6 +4,7 @@ import com.oldspaceman.dao.follows.FollowsDao
 import com.oldspaceman.dao.post.PostDao
 import com.oldspaceman.dao.post.PostRow
 import com.oldspaceman.dao.post_likes.PostLikesDao
+import com.oldspaceman.dao.user.UserDao
 import com.oldspaceman.model.*
 import com.oldspaceman.util.Response
 import io.ktor.http.*
@@ -11,7 +12,8 @@ import io.ktor.http.*
 class PostRepositoryImpl(
     private val postDao: PostDao,
     private val followsDao: FollowsDao,
-    private val postLikesDao: PostLikesDao
+    private val postLikesDao: PostLikesDao,
+
 ) : PostRepository {
 
 
@@ -23,6 +25,7 @@ class PostRepositoryImpl(
         )
 
         return if (postRow != null){
+            postDao.updatePostCount(userId = postTextParam.userId) // увеличиваем кол-во постов у юзера
             Response.Success(
                 data = PostResponse(
                     success = true,
@@ -148,6 +151,10 @@ class PostRepositoryImpl(
             val postIsDeleted = postDao.deletePost(postId = postParams.postId)
 
             if (postIsDeleted) {
+                //уменьшаем каунт постов на -1
+                postDao.updatePostCount(userId = postParams.userId, decrement = true)
+
+
                 Response.Success(
                     data = PostResponse(success = true) // notify only what post deleted
                 )
@@ -165,7 +172,7 @@ class PostRepositoryImpl(
                 code = HttpStatusCode.Forbidden,
                 data = PostResponse(
                     success = false,
-                    message = "User is not the owner of the post"
+                    message = "User is not the owner of the post or or the post doesn't exist"
                 )
             )
         }

@@ -20,7 +20,8 @@ data class Profile(
     val followersCount: Int = 0,
     val followingCount: Int = 0,
     val isFollowing: Boolean, // if current user following -> navigate to profile screen(own profile)
-    val isOwnProfile: Boolean // show edit or follow
+    val isOwnProfile: Boolean, // show edit or follow
+    val postCount: Int
 )
 
 

@@ -79,7 +79,8 @@ class AuthRepositoryImpl(
                                 // also verified what token is not null
                                 // we pass this = Security.kt
                             followingCount = user.followingCount,
-                            followersCount = user.followersCount
+                            followersCount = user.followersCount,
+                            postCount = user.postCount
                         )
                     )
                 )

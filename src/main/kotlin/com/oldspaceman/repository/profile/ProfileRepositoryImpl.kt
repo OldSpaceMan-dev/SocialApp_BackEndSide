@@ -89,7 +89,8 @@ class ProfileRepositoryImpl(
             followersCount = userRow.followersCount,
             followingCount = userRow.followingCount,
             isFollowing = isFollowing,
-            isOwnProfile = isOwnProfile
+            isOwnProfile = isOwnProfile,
+            postCount = userRow.postCount
         )
     }
 }

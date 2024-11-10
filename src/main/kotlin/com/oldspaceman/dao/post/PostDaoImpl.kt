@@ -133,6 +133,36 @@ class PostDaoImpl : PostDao {
     }
 
 
+
+    override suspend fun updatePostCount(userId: Long, decrement: Boolean): Boolean {
+        return dbQuery {
+
+            //получаем у текущ юзера колл-во постов
+            val currentCount = UserTable
+                .select{ UserTable.id eq userId }
+                .singleOrNull()?.get(UserTable.postCount) ?: return@dbQuery false
+
+            // Если мы хотим уменьшить, но `postCount` уже равен 0, то пропускаем обновление
+            val newCount = if (decrement) {
+                if (currentCount > 0) currentCount -1 else currentCount
+            } else {
+                currentCount + 1
+            }
+
+            UserTable.update(where = {UserTable.id eq userId} ) {
+                it[postCount] = newCount
+            } > 0
+        }
+    }
+
+    /*
+   val newCount = if (decrement) -1 else 1
+   UserTable.update(where = {UserTable.id eq userId}) {
+       it.update(column = postCount, value = postCount.plus(newCount))
+    */
+
+
+
     //private fun
     private fun getPosts(
         users: List<Long>,

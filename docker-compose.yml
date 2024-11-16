@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: backend_app
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/socialmediadb
+      - DB_USERNAME=your_database_user
+      - DB_PASSWORD=your_database_password
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: OldSpaceMan
+      POSTGRES_PASSWORD: Arkadiy007
+      POSTGRES_DB: socialmediadb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local

@@ -28,12 +28,17 @@ object DatabaseFactory {
     private fun createHikariDataSource(): HikariDataSource {
         val driverClass = "org.postgresql.Driver"
         //adress database == defolt 5432 port
-        val jdbcUrl = "jdbc:postgresql://localhost:5432/socialmediadb"
+        // Получение параметров из переменных окружения с fallback на значения по умолчанию
+        val jdbcUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/socialmediadb"
+        val username = System.getenv("DB_USERNAME") ?: "arkadiyblank"
+        val password = System.getenv("DB_PASSWORD") ?: "***"
 
         val hikariConfig = HikariConfig().apply {
             //configuration for hikari
             driverClassName = driverClass
             setJdbcUrl(jdbcUrl)
+            setUsername(username)
+            setPassword(password)
             maximumPoolSize = 3 // мах колл-во соединений с БД - переиспользуются
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
@@ -43,6 +48,7 @@ object DatabaseFactory {
         return HikariDataSource(hikariConfig)
     }
 
+    // Метод для выполнения запросов к базе данных
     //generic helper method to execute on database queries
     // take suspend fun and return T type
     suspend fun <T> dbQuery(block: suspend () -> T) =

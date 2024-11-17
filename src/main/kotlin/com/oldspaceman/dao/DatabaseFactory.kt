@@ -31,14 +31,14 @@ object DatabaseFactory {
         // Получение параметров из переменных окружения с fallback на значения по умолчанию
         val jdbcUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/socialmediadb"
         val username = System.getenv("DB_USERNAME") ?: "arkadiyblank"
-        val password = System.getenv("DB_PASSWORD") ?: "***"
+        val password = System.getenv("DB_PASSWORD") ?: "Arkadiy007"
 
         val hikariConfig = HikariConfig().apply {
             //configuration for hikari
             driverClassName = driverClass
             setJdbcUrl(jdbcUrl)
-            setUsername(username)
-            setPassword(password)
+            setUsername(username) //TODO можно удалить
+            setPassword(password) //TODO можно удалить
             maximumPoolSize = 3 // мах колл-во соединений с БД - переиспользуются
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"

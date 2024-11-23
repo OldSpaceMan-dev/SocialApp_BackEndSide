@@ -19,7 +19,7 @@ import java.io.File
 
 //route handle the request (маршрут обработки запросов)
 
-
+// dsdad
 fun Routing.postRouting(){
 
     val postRepository by inject<PostRepository>()
